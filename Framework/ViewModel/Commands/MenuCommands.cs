@@ -16,6 +16,7 @@ using static Framework.Converters.ImageConverter;
 using Algorithms.Sections;
 using Algorithms.Tools;
 using Algorithms.Utilities;
+using System.Collections.Generic;
 
 namespace Framework.ViewModel
 {
@@ -488,7 +489,6 @@ namespace Framework.ViewModel
 
         #endregion
 
-
         #region Copy image
         private ICommand _copyImageCommand;
         public ICommand CopyImageCommand
@@ -593,12 +593,160 @@ namespace Framework.ViewModel
         }
         #endregion
 
+        #region Thresholding
+        private ICommand _thresholdingCommand;
+        public ICommand ThresholdingCommand
+        {
+            get
+            {
+                if (_thresholdingCommand == null)
+                    _thresholdingCommand = new RelayCommand(Thresholding);
+                return _thresholdingCommand;
+            }
+        }
+
+        private void Thresholding(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            SliderWindow swindow = new SliderWindow(_mainVM, "Threshold: ");
+            swindow.ConfigureSlider(
+                minimumValue: 10,
+                maximumValue: 154,
+                value: 82,
+                frequency: 1);
+            swindow.ShowDialog();
+
+            ClearProcessedCanvas(parameter);
+
+            var threshold = swindow.slider.Value;
+
+            if (ColorInitialImage != null)
+            {
+                var GrayTransitionImage = Tools.Convert(ColorInitialImage);
+                GrayProcessedImage = Tools.Thresholding(GrayTransitionImage, (int)threshold);
+            }
+            else if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Thresholding(GrayInitialImage, (int)threshold);
+            }
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
+        #endregion
+
+        #region Mirror
+
+        private ICommand _mirrorCommand;
+        public ICommand MirrorCommand
+        {
+            get
+            {
+                if (_mirrorCommand == null)
+                    _mirrorCommand = new RelayCommand(Mirror);
+                return _mirrorCommand;
+            }
+        }
+
+        private void Mirror(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Mirror(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Mirror(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+        #endregion
+
+        #region ClockwiseRotation
+        private ICommand _clockwiseRotationCommand;
+        public ICommand ClockwiseRotationCommand
+        {
+            get
+            {
+                if (_clockwiseRotationCommand == null)
+                    _clockwiseRotationCommand = new RelayCommand(ClockwiseRotation);
+                return _clockwiseRotationCommand;
+            }
+        }
+
+        private void ClockwiseRotation(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.ClockwiseRotation(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.ClockwiseRotation(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+        #endregion
+
+        #region AntiClockwiseRotation
+        private ICommand _antiClockwiseRotationCommand;
+        public ICommand AntiClockwiseRotationCommand
+        {
+            get
+            {
+                if (_antiClockwiseRotationCommand == null)
+                    _antiClockwiseRotationCommand = new RelayCommand(AntiClockwiseRotation);
+                return _antiClockwiseRotationCommand;
+            }
+        }
+
+        private void AntiClockwiseRotation(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.AntiClockwiseRotation(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.AntiClockwiseRotation(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Pointwise operations
-        #endregion
-
-        #region Thresholding
         #endregion
 
         #region Filters

@@ -167,6 +167,22 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.ConvertImageToGrayscaleCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Thresholding"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ThresholdingCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Mirror Image"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.MirrorCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Clockwise Rotation"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ClockwiseRotationCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Trigonometric Rotation"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.AntiClockwiseRotationCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"
