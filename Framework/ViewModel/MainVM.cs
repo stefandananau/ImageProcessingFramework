@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Drawing;
+using System.Windows.Input;
 using System.Windows.Media;
 
 using Framework.Model;
@@ -251,5 +252,6 @@ namespace Framework.ViewModel
             }
         }
         #endregion
+
     }
 }

@@ -11,6 +11,8 @@ using Framework.ViewModel;
 using static Framework.Utilities.DataProvider;
 using static Framework.Utilities.UiHelper;
 using static Framework.Utilities.DrawingHelper;
+using Framework.Utilities;
+using System.Windows.Media;
 
 namespace Framework.View
 {
@@ -82,7 +84,35 @@ namespace Framework.View
         private void ImageMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender == initialImage)
+            {
                 MousePosition = e.GetPosition(initialImage);
+                if (CropOn)
+                {
+                    CropCount++;
+                    if (CropCount == 1)
+                    {
+                        FirstCropPoint = MousePosition;
+                    }
+                    else if (CropCount == 2)
+                    {
+                        SecondCropPoint = MousePosition;
+                        DrawRectangle(canvasOriginalImage,
+                            PointHelper.GetLeftTop(FirstCropPoint, SecondCropPoint),
+                            PointHelper.GetRightBottom(FirstCropPoint, SecondCropPoint),
+                            2, Brushes.Red, 1);
+                    }
+                    else
+                    {
+                        CropCount = 1;
+                        FirstCropPoint = MousePosition;
+                        RemoveUiElements(canvasOriginalImage);
+                    }
+                }
+                else
+                {
+                    RemoveUiElements(canvasOriginalImage);
+                }
+            }
             else if (sender == processedImage)
                 MousePosition = e.GetPosition(processedImage);
 

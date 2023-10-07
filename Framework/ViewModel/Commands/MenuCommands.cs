@@ -12,6 +12,7 @@ using static Framework.Utilities.DataProvider;
 using static Framework.Utilities.FileHelper;
 using static Framework.Utilities.DrawingHelper;
 using static Framework.Converters.ImageConverter;
+using static Framework.Utilities.PointHelper;
 
 using Algorithms.Sections;
 using Algorithms.Tools;
@@ -742,6 +743,61 @@ namespace Framework.ViewModel
                 ProcessedImage = Convert(ColorProcessedImage);
             }
         }
+        #endregion
+
+        #region Crop
+        private ICommand _cropCommand;
+        public ICommand CropCommand
+        {
+            get
+            {
+                if (_cropCommand == null)
+                    _cropCommand = new RelayCommand(Crop);
+                return _cropCommand;
+            }
+        }
+
+        private void Crop(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            if (!CropOn)
+            {
+                CropCount = 0;
+                CropOn = true;
+                return;
+            }
+
+            if(CropCount != 2)
+            {
+                MessageBox.Show("Please select 2 points!");
+                CropCount = 0;
+                CropOn = true;
+                return;
+            }
+
+            CropOn = false;
+            ClearProcessedCanvas(parameter);
+            var leftTop = new System.Drawing.Point((int)GetLeftTop(FirstCropPoint, SecondCropPoint).X, (int)GetLeftTop(FirstCropPoint, SecondCropPoint).Y);
+            var rightBottom = new System.Drawing.Point((int)GetRightBottom(FirstCropPoint, SecondCropPoint).X, (int)GetRightBottom(FirstCropPoint, SecondCropPoint).Y);
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Crop(GrayInitialImage, leftTop, rightBottom);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Crop(ColorInitialImage, leftTop, rightBottom);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+
+            MessageBox.Show("Done");
+        }
+
+        
         #endregion
 
         #endregion

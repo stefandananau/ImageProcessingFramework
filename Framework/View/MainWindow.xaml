@@ -167,10 +167,6 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.ConvertImageToGrayscaleCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                <MenuItem Header="Thresholding"
-                          Foreground="#1E1E1E"
-                          Command="{Binding Path=MenuCommands.ThresholdingCommand}"
-                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                 <MenuItem Header="Mirror Image"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.MirrorCommand}"
@@ -183,6 +179,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.AntiClockwiseRotationCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Crop Image"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.CropCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"
@@ -193,8 +193,9 @@
 
             <MenuItem Header="Thresholding"
                       Background="{Binding Path=Theme.MenuItemBackgroundColor}"
-                      Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
-
+                      Foreground="{Binding Path=Theme.MenuItemForegroundColor}"
+                      Command="{Binding Path=MenuCommands.ThresholdingCommand}"
+                      CommandParameter="{Binding ElementName=canvasProcessedImage}">
             </MenuItem>
 
             <MenuItem Header="Filters" 

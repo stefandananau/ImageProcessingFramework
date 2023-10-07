@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Drawing;
 
 namespace Algorithms.Tools
 {
@@ -168,6 +169,41 @@ namespace Algorithms.Tools
             }
             return result;
         }
+        #endregion
+
+        #region Crop
+        public static Image<Gray, byte> Crop(Image<Gray, byte> inputImage, Point leftTop, Point rightBottom)
+        {
+            Image<Gray, byte> result = new Image<Gray, byte>(height: rightBottom.Y - leftTop.Y, width: rightBottom.X - leftTop.X);
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    if (x >= leftTop.X && x < rightBottom.X && y >= leftTop.Y && y < rightBottom.Y)
+                        result.Data[y - leftTop.Y, x - leftTop.X, 0] = inputImage.Data[y, x, 0];
+                }
+            }
+            return result;
+        }
+
+        public static Image<Bgr, byte> Crop(Image<Bgr, byte> inputImage, Point leftTop, Point rightBottom)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(height: rightBottom.Y - leftTop.Y, width: rightBottom.X - leftTop.X);
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    if (x >= leftTop.X && x < rightBottom.X && y >= leftTop.Y && y < rightBottom.Y)
+                    {
+                        result.Data[y - leftTop.Y, x - leftTop.X, 0] = inputImage.Data[y, x, 0];
+                        result.Data[y - leftTop.Y, x - leftTop.X, 1] = inputImage.Data[y, x, 1];
+                        result.Data[y - leftTop.Y, x - leftTop.X, 2] = inputImage.Data[y, x, 2];
+                    }
+                }
+            }
+            return result;
+        }
+
         #endregion
     }
 }

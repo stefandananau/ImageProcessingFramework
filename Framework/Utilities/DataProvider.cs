@@ -15,20 +15,25 @@ namespace Framework.Utilities
 
         public static Point MousePosition { get; set; }
         public static Point LastPosition { get; set; }
+        public static Point FirstCropPoint { get; set; }
+        public static Point SecondCropPoint { get; set; }
         public static PointCollection VectorOfMousePosition { get; set; }
-
         public static bool MagnifierOn { get; set; }
         public static bool RowColorLevelsOn { get; set; }
         public static bool ColumnColorLevelsOn { get; set; }
         public static bool InitialHistogramOn { get; set; }
         public static bool ProcessedHistogramOn { get; set; }
         public static bool SliderOn { get; set; }
+        public static bool CropOn { get; set; }
+        public static int CropCount { get; set; }
 
         static DataProvider()
         {
             MousePosition = new Point(0, 0);
             LastPosition = MousePosition;
             VectorOfMousePosition = new PointCollection();
+            CropOn = false;
+            CropCount = 0;
         }
 
         public static void CloseWindow<TWindow>()
