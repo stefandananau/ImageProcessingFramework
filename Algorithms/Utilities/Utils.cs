@@ -1,6 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
-
+using System;
 using static System.Math;
 
 namespace Algorithms.Utilities
@@ -101,6 +101,60 @@ namespace Algorithms.Utilities
         public static void Swap<T>(ref T lhs, ref T rhs)
         {
             (rhs, lhs) = (lhs, rhs);
+        }
+        #endregion
+
+        #region Means
+        public static int[] GetVector(Image<Gray, byte> inputImage)
+        {
+            var vector = new int[inputImage.Width * inputImage.Height];
+            int k = 0;
+            for(int i = 0; i < inputImage.Height; i++)
+            {
+                for(int j = 0; j < inputImage.Width; j++)
+                {
+                    vector[k] = inputImage.Data[i, j, 0];
+                    k++;
+                }
+            }
+            return vector;
+        }
+
+        public static int[,] GetMatrix(Image<Bgr, byte> inputImage)
+        {
+            int[,] matrix = new int[3, inputImage.Width * inputImage.Height];
+            int k = 0;
+            for (int i = 0; i < inputImage.Height; i++)
+            {
+                for (int j = 0; j < inputImage.Width; j++)
+                {
+                    matrix[0, k] = inputImage.Data[i, j, 0];
+                    matrix[1, k] = inputImage.Data[i, j, 1];
+                    matrix[2, k] = inputImage.Data[i, j, 2];
+                    k++;
+                }
+            }
+            return matrix;
+        }
+
+        public static int[] SquareVector(int[] vector)
+        {
+            int[] result = new int[vector.Length];
+            for(int i = 0; i < vector.Length; i++) 
+            {
+                result[i] = vector[i] * vector[i];
+            }
+            return result;
+        }
+
+        public static double VectorMean(int[] vector)
+        {
+            double sum = 0;
+            for (int i = 0; i < vector.Length; i++)
+            {
+                sum = sum + vector[i];
+            }
+            return sum/vector.Length;
         }
         #endregion
     }

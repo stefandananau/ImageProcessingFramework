@@ -1,23 +1,19 @@
-﻿using Emgu.CV;
+﻿using Algorithms.Tools;
+using Algorithms.Utilities;
+using Emgu.CV;
 using Emgu.CV.Structure;
-
-using System.Windows;
+using Framework.Extensions;
+using Framework.View;
 using System.Drawing.Imaging;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Controls;
-
-using Framework.View;
-using static Framework.Utilities.DataProvider;
-using static Framework.Utilities.FileHelper;
-using static Framework.Utilities.DrawingHelper;
 using static Framework.Converters.ImageConverter;
+using static Framework.Utilities.DataProvider;
+using static Framework.Utilities.DrawingHelper;
+using static Framework.Utilities.FileHelper;
 using static Framework.Utilities.PointHelper;
-
-using Algorithms.Sections;
-using Algorithms.Tools;
-using Algorithms.Utilities;
-using System.Collections.Generic;
 
 namespace Framework.ViewModel
 {
@@ -787,36 +783,47 @@ namespace Framework.ViewModel
             {
                 GrayProcessedImage = Tools.Crop(GrayInitialImage, leftTop, rightBottom);
                 ProcessedImage = Convert(GrayProcessedImage);
+                var vector = Utils.GetVector(GrayProcessedImage);
+                var media = Utils.VectorMean(vector);
+                var dispersia = Utils.VectorMean(Utils.SquareVector(vector)) - media * media;
+                MessageBox.Show($"Media: {media}\nAbaterea medie patratica: {dispersia * dispersia}" );
             }
             else if (ColorInitialImage != null)
             {
                 ColorProcessedImage = Tools.Crop(ColorInitialImage, leftTop, rightBottom);
                 ProcessedImage = Convert(ColorProcessedImage);
+                var matrix = Utils.GetMatrix(ColorProcessedImage);
+                var mediaB = Utils.VectorMean(matrix.GetRow(0));
+                var mediaG = Utils.VectorMean(matrix.GetRow(1));
+                var mediaR = Utils.VectorMean(matrix.GetRow(2));
+                var abatereaB = Utils.VectorMean(Utils.SquareVector(matrix.GetRow(0))) - mediaB * mediaB;
+                var abatereaG = Utils.VectorMean(Utils.SquareVector(matrix.GetRow(1))) - mediaG * mediaG;
+                var abatereaR = Utils.VectorMean(Utils.SquareVector(matrix.GetRow(2))) - mediaR * mediaR;
+                MessageBox.Show($"Media\nBlue:{mediaB}\nGreen:{mediaG}\nRed:{mediaR}\n\n" +
+                    $"Abaterea medie patratica\nBlue:{abatereaB}\nGreen:{abatereaG}\nRed:{abatereaR}");
             }
-
-            MessageBox.Show("Done");
         }
 
-        
-        #endregion
+
+
+
+
+
+
+
 
         #endregion
-
+        #endregion
         #region Pointwise operations
         #endregion
-
         #region Filters
         #endregion
-
         #region Morphological operations
         #endregion
-
         #region Geometric transformations
         #endregion
-
         #region Segmentation
         #endregion
-
         #region Save processed image as original image
         private ICommand _saveAsOriginalImageCommand;
         public ICommand SaveAsOriginalImageCommand

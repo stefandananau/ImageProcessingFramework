@@ -63,6 +63,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\ArrrayMultiValueConverter.cs" />
+    <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Model\DialogBoxParameter.cs" />
     <Compile Include="Model\ThemeModes\CobaltBlueTheme.cs" />
     <Compile Include="Model\ThemeModes\LavenderVioletTheme.cs" />

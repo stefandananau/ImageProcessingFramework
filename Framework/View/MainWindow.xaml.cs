@@ -99,7 +99,7 @@ namespace Framework.View
                         DrawRectangle(canvasOriginalImage,
                             PointHelper.GetLeftTop(FirstCropPoint, SecondCropPoint),
                             PointHelper.GetRightBottom(FirstCropPoint, SecondCropPoint),
-                            2, Brushes.Red, 1);
+                            2, Brushes.Red, sliderZoom.Value);
                     }
                     else
                     {
