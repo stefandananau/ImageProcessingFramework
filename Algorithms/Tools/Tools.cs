@@ -1,6 +1,8 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Drawing;
+using System;
+using OpenTK.Graphics.OpenGL;
 
 namespace Algorithms.Tools
 {
@@ -204,6 +206,122 @@ namespace Algorithms.Tools
             return result;
         }
 
+        #endregion
+
+        #region ColorCheck
+
+        public static byte CalculateGrey(int[] color)
+        {
+            return (byte)(0.3 * color[0] + 0.6 * color[1] + 0.1 * color[2]);
+        }
+
+        public static double CalculateDistance3D(int[] color1, int[] color2)
+        {
+            return Math.Sqrt(Math.Pow(color1[0] - color2[0], 2)
+                   + Math.Pow(color1[1] - color2[1], 2)
+                   + Math.Pow(color1[2] - color2[2], 2));
+        }
+
+        public static Image<Bgr, byte> ColorCheck(Image<Bgr, byte> inputImage, double distance, int[] color)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    int[] color2 = new int[3];
+                    color2[0] = inputImage.Data[y, x, 0];
+                    color2[1] = inputImage.Data[y, x, 1];
+                    color2[2] = inputImage.Data[y, x, 2];
+                    if (distance >= CalculateDistance3D(color, color2))
+                    {
+                        result.Data[y, x, 0] = inputImage.Data[y, x, 0];
+                        result.Data[y, x, 1] = inputImage.Data[y, x, 1];
+                        result.Data[y, x, 2] = inputImage.Data[y, x, 2];
+                    }
+                    else
+                    {
+                        result.Data[y, x, 0] = CalculateGrey(color2);
+                        result.Data[y, x, 1] = CalculateGrey(color2);
+                        result.Data[y, x, 2] = CalculateGrey(color2);
+                    }
+
+                }
+            }
+            return result;
+        }
+
+        public static Image<Bgr, byte> Bin3D(Image<Bgr, byte> inputImage, double distance, int[] color)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    int[] color2 = new int[3];
+                    color2[0] = inputImage.Data[y, x, 0];
+                    color2[1] = inputImage.Data[y, x, 1];
+                    color2[2] = inputImage.Data[y, x, 2];
+                    if (distance >= CalculateDistance3D(color, color2))
+                    {
+                        result.Data[y, x, 0] = 255;
+                        result.Data[y, x, 1] = 255;
+                        result.Data[y, x, 2] = 255;
+                    }
+                    else
+                    {
+                        result.Data[y, x, 0] = 0;
+                        result.Data[y, x, 1] = 0;
+                        result.Data[y, x, 2] = 0;
+                    }
+
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region Binarizare 2D
+
+        public static double CalculateDistance2D(int[] color1, int[] color2)
+        {
+            double div1 = color1[0] + color1[1] + color1[2];
+            double div2 = color2[0] + color2[1] + color2[2];
+            double r1 = div1 == 0 ? 0 : color1[2] / div1;
+            double g1 = div1 == 0 ? 0 : color1[1] / div1;
+            double r2 = div2 == 0 ? 0 : color2[2] / div2;
+            double g2 = div2 == 0 ? 0 : color2[1] / div2;
+            double dis =  Math.Sqrt(Math.Pow(r2 - r1, 2) + Math.Pow(g2 - g1, 2));
+            return dis;
+        }
+        public static Image<Bgr, byte> Bin2D(Image<Bgr, byte> inputImage, double distance, int[] color)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    int[] color2 = new int[3];
+                    color2[0] = inputImage.Data[y, x, 0];
+                    color2[1] = inputImage.Data[y, x, 1];
+                    color2[2] = inputImage.Data[y, x, 2];
+                    if (distance >= CalculateDistance2D(color, color2))
+                    {
+                        result.Data[y, x, 0] = 255;
+                        result.Data[y, x, 1] = 255;
+                        result.Data[y, x, 2] = 255;
+                    }
+                    else
+                    {
+                        result.Data[y, x, 0] = 0;
+                        result.Data[y, x, 1] = 0;
+                        result.Data[y, x, 2] = 0;
+                    }
+
+                }
+            }
+            return result;
+        }
         #endregion
     }
 }

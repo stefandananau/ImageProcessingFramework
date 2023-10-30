@@ -785,8 +785,8 @@ namespace Framework.ViewModel
                 ProcessedImage = Convert(GrayProcessedImage);
                 var vector = Utils.GetVector(GrayProcessedImage);
                 var media = Utils.VectorMean(vector);
-                var dispersia = Utils.VectorMean(Utils.SquareVector(vector)) - media * media;
-                MessageBox.Show($"Media: {media}\nAbaterea medie patratica: {dispersia * dispersia}" );
+                var abaterea = Utils.VectorMean(Utils.SquareVector(vector)) - media * media;
+                MessageBox.Show($"Media: {media}\nAbaterea medie patratica: {abaterea}" );
             }
             else if (ColorInitialImage != null)
             {
@@ -803,16 +803,156 @@ namespace Framework.ViewModel
                     $"Abaterea medie patratica\nBlue:{abatereaB}\nGreen:{abatereaG}\nRed:{abatereaR}");
             }
         }
+        #endregion
 
+        #region Color Something
+        private ICommand _colorCheckCommand;
+        public ICommand ColorCheckCommand
+        {
+            get
+            {
+                if (_colorCheckCommand == null)
+                    _colorCheckCommand = new RelayCommand(ColorCheck);
+                return _colorCheckCommand;
+            }
+        }
 
+        private void ColorCheck(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            if(ColorInitialImage == null)
+            {
+                MessageBox.Show("Initial image must be color !");
+                return;
+            }
+            if(LastPosition == null)
+            {
+                MessageBox.Show("Select a color first");
+                return;
+            }
+            SliderWindow swindow = new SliderWindow(_mainVM, "Threshold: ");
+            swindow.ConfigureSlider(
+                minimumValue: 10,
+                maximumValue: 154,
+                value: 82,
+                frequency: 1);
+            swindow.ShowDialog();
 
+            ClearProcessedCanvas(parameter);
 
+            var distance = swindow.slider.Value;
 
-
-
-
+            var color = new int[3];
+            color[0] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 0];
+            color[1] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 1];
+            color[2] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 2];
+            ColorProcessedImage = Tools.ColorCheck(ColorInitialImage, distance, color);
+            ProcessedImage = Convert(ColorProcessedImage);
+        }
+        #endregion
 
         #endregion
+
+        #region Binarizare
+        private ICommand _Bin3DCommand;
+        public ICommand Bin3DCommand
+        {
+            get
+            {
+                if (_Bin3DCommand == null)
+                    _Bin3DCommand = new RelayCommand(Bin3D);
+                return _Bin3DCommand;
+            }
+        }
+
+        private void Bin3D(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            if (ColorInitialImage == null)
+            {
+                MessageBox.Show("Initial image must be color !");
+                return;
+            }
+            if (LastPosition == null)
+            {
+                MessageBox.Show("Select a color first");
+                return;
+            }
+            SliderWindow swindow = new SliderWindow(_mainVM, "Threshold: ");
+            swindow.ConfigureSlider(
+                minimumValue: 10,
+                maximumValue: 154,
+                value: 82,
+                frequency: 1);
+            swindow.ShowDialog();
+
+            ClearProcessedCanvas(parameter);
+
+            var distance = swindow.slider.Value;
+
+            var color = new int[3];
+            color[0] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 0];
+            color[1] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 1];
+            color[2] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 2];
+            ColorProcessedImage = Tools.Bin3D(ColorInitialImage, distance, color);
+            ProcessedImage = Convert(ColorProcessedImage);
+        }
+
+        private ICommand _Bin2DCommand;
+        public ICommand Bin2DCommand
+        {
+            get
+            {
+                if (_Bin2DCommand == null)
+                    _Bin2DCommand = new RelayCommand(Bin2D);
+                return _Bin2DCommand;
+            }
+        }
+
+        private void Bin2D(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            if (ColorInitialImage == null)
+            {
+                MessageBox.Show("Initial image must be color !");
+                return;
+            }
+            if (LastPosition == null)
+            {
+                MessageBox.Show("Select a color first");
+                return;
+            }
+            SliderWindow swindow = new SliderWindow(_mainVM, "Threshold: ");
+            swindow.ConfigureSlider(
+                minimumValue: 0.1,
+                maximumValue: 0.9,
+                value: 0.5,
+                frequency: 0.01);
+            swindow.ShowDialog();
+
+            ClearProcessedCanvas(parameter);
+
+            var distance = swindow.slider.Value;
+
+            var color = new int[3];
+            color[0] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 0];
+            color[1] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 1];
+            color[2] = ColorInitialImage.Data[(int)LastPosition.Y, (int)LastPosition.X, 2];
+            ColorProcessedImage = Tools.Bin2D(ColorInitialImage, distance, color);
+            ProcessedImage = Convert(ColorProcessedImage);
+        }
         #endregion
         #region Pointwise operations
         #endregion

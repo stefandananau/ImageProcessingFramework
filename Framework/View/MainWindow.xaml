@@ -183,6 +183,18 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.CropCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Color Check"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ColorCheckCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Binarizare 3D"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.Bin3DCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Binarizare 2D"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.Bin2DCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"
