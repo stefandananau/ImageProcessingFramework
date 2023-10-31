@@ -4,6 +4,7 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using Framework.Extensions;
 using Framework.View;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows;
 using System.Windows.Controls;
@@ -954,16 +955,52 @@ namespace Framework.ViewModel
             ProcessedImage = Convert(ColorProcessedImage);
         }
         #endregion
-        #region Pointwise operations
+
+        #region Filtru medie aritmetica
+        private ICommand _averageFilterCommand;
+        public ICommand AverageFilterCommand
+        {
+            get
+            {
+                if (_averageFilterCommand == null)
+                    _averageFilterCommand = new RelayCommand(AverageFilter);
+                return _averageFilterCommand;
+            }
+        }
+
+        private void AverageFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+
+            SliderWindow swindow = new SliderWindow(_mainVM, "Mask dimension: ");
+            swindow.ConfigureSlider(
+                minimumValue: 3,
+                maximumValue: 25,
+                value: 3,
+                frequency: 2);
+            swindow.ShowDialog();
+
+            ClearProcessedCanvas(parameter);
+
+            var maskdim = (int)swindow.slider.Value;
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.AverageFilter(GrayInitialImage, maskdim);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.AverageFilter(ColorInitialImage, maskdim);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
         #endregion
-        #region Filters
-        #endregion
-        #region Morphological operations
-        #endregion
-        #region Geometric transformations
-        #endregion
-        #region Segmentation
-        #endregion
+
         #region Save processed image as original image
         private ICommand _saveAsOriginalImageCommand;
         public ICommand SaveAsOriginalImageCommand

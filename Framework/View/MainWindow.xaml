@@ -195,6 +195,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.Bin2DCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Average Filter"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.AverageFilterCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"

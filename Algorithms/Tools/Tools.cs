@@ -3,6 +3,7 @@ using Emgu.CV.Structure;
 using System.Drawing;
 using System;
 using OpenTK.Graphics.OpenGL;
+using ZedGraph;
 
 namespace Algorithms.Tools
 {
@@ -318,6 +319,147 @@ namespace Algorithms.Tools
                         result.Data[y, x, 2] = 0;
                     }
 
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region AverageFilter
+        private static byte ComputeAverage(Image<Gray, byte> image, int y, int x, int maskdim)
+        {
+            int sum = 0;
+            for(int i = y; i < y + maskdim; i++)
+            {
+                for(int j = x; j < x + maskdim; j++)
+                {
+                    sum = sum + image.Data[i, j, 0];
+                }
+            }
+            return (byte)(sum / (maskdim * maskdim));
+        }
+        private static byte[] ComputeAverage(Image<Bgr, byte> image, int y, int x, int maskdim)
+        {
+            int b = 0;
+            int g = 0;
+            int r = 0;
+            byte[] result = new byte[3]; 
+            for (int i = y; i < y + maskdim; i++)
+            {
+                for (int j = x; j < x + maskdim; j++)
+                {
+                    b = b + image.Data[i, j, 0];
+                    g = g + image.Data[i, j, 1];
+                    r = r + image.Data[i, j, 2];
+                }
+            }
+            result[0] = (byte)(b / (maskdim * maskdim));
+            result[1] = (byte)(g / (maskdim * maskdim));
+            result[2] = (byte)(r / (maskdim * maskdim));
+            return result;
+        }
+
+        public static Image<Gray, byte> AverageFilter(Image<Gray, byte> inputImage, int maskdim)
+        {
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+            Image<Gray, byte> helper = new Image<Gray, byte>(height:inputImage.Height + maskdim - 1, width:inputImage.Width + maskdim - 1);
+            int border = (maskdim - 1) / 2;
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    helper.Data[y + border, x + border, 0] = inputImage.Data[y, x, 0];
+                }
+            }
+            //schimbam culoarea noilor pixeli in culoarea celui mai apropiat pixel
+            for (int i = 0; i < border; i++)
+            {
+                for(int j = 0; j < inputImage.Height; j++)
+                {
+                    helper.Data[j + border, i, 0] = inputImage.Data[j, 0, 0];
+                    helper.Data[j + border, inputImage.Width + border + i, 0] = inputImage.Data[j, inputImage.Width - 1, 0];
+                }
+                for (int j = 0; j < inputImage.Width; j++)
+                {
+                    helper.Data[i, j + border, 0] = inputImage.Data[0, j, 0];
+                    helper.Data[inputImage.Height + border + i, j + border , 0] = inputImage.Data[inputImage.Height - 1, j, 0];
+                }
+                for (int j = 0; j < border; j++)
+                {
+                    helper.Data[i, j, 0] = inputImage.Data[0, 0, 0];
+                    helper.Data[inputImage.Height + border + i, j, 0] = inputImage.Data[inputImage.Height - 1, 0, 0];
+                    helper.Data[i, inputImage.Width + border + j, 0] = inputImage.Data[0, inputImage.Width - 1, 0];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 0] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 0];
+                }
+            }
+
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    result.Data[y, x, 0] = ComputeAverage(helper, y, x, maskdim);
+                }
+            }
+            return result;
+        }
+        public static Image<Bgr, byte> AverageFilter(Image<Bgr, byte> inputImage, int maskdim)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            Image<Bgr, byte> helper = new Image<Bgr, byte>(height: inputImage.Height + maskdim - 1, width: inputImage.Width + maskdim - 1);
+            int border = (maskdim - 1) / 2;
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    helper.Data[y + border, x + border, 0] = inputImage.Data[y, x, 0];
+                    helper.Data[y + border, x + border, 1] = inputImage.Data[y, x, 1];
+                    helper.Data[y + border, x + border, 2] = inputImage.Data[y, x, 2];
+                }
+            }
+            for (int i = 0; i < border; i++)
+            {
+                for (int j = 0; j < inputImage.Height; j++)
+                {
+                    helper.Data[j + border, i, 0] = inputImage.Data[j, 0, 0];
+                    helper.Data[j + border, i, 1] = inputImage.Data[j, 0, 1];
+                    helper.Data[j + border, i, 2] = inputImage.Data[j, 0, 2];
+                    helper.Data[j + border, inputImage.Width + border + i, 0] = inputImage.Data[j, inputImage.Width - 1, 0];
+                    helper.Data[j + border, inputImage.Width + border + i, 1] = inputImage.Data[j, inputImage.Width - 1, 1];
+                    helper.Data[j + border, inputImage.Width + border + i, 2] = inputImage.Data[j, inputImage.Width - 1, 2];
+                }
+                for (int j = 0; j < inputImage.Width; j++)
+                {
+                    helper.Data[i, j + border, 0] = inputImage.Data[0, j, 0];
+                    helper.Data[i, j + border, 1] = inputImage.Data[0, j, 1];
+                    helper.Data[i, j + border, 2] = inputImage.Data[0, j, 2];
+                    helper.Data[inputImage.Height + border + i, j + border, 0] = inputImage.Data[inputImage.Height - 1, j, 0];
+                    helper.Data[inputImage.Height + border + i, j + border, 1] = inputImage.Data[inputImage.Height - 1, j, 1];
+                    helper.Data[inputImage.Height + border + i, j + border, 2] = inputImage.Data[inputImage.Height - 1, j, 2];
+                }
+                for (int j = 0; j < border; j++)
+                {
+                    helper.Data[i, j, 0] = inputImage.Data[0, 0, 0];
+                    helper.Data[i, j, 1] = inputImage.Data[0, 0, 1];
+                    helper.Data[i, j, 2] = inputImage.Data[0, 0, 2];
+                    helper.Data[inputImage.Height + border + i, j, 0] = inputImage.Data[inputImage.Height - 1, 0, 0];
+                    helper.Data[inputImage.Height + border + i, j, 1] = inputImage.Data[inputImage.Height - 1, 0, 1];
+                    helper.Data[inputImage.Height + border + i, j, 2] = inputImage.Data[inputImage.Height - 1, 0, 2];
+                    helper.Data[i, inputImage.Width + border + j, 0] = inputImage.Data[0, inputImage.Width - 1, 0];
+                    helper.Data[i, inputImage.Width + border + j, 1] = inputImage.Data[0, inputImage.Width - 1, 1];
+                    helper.Data[i, inputImage.Width + border + j, 2] = inputImage.Data[0, inputImage.Width - 1, 2];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 0] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 0];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 1] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 1];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 2] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 2];
+                }
+            }
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    var res = ComputeAverage(helper, y, x, maskdim);
+                    result.Data[y, x, 0] = res[0];
+                    result.Data[y, x, 1] = res[1];
+                    result.Data[y, x, 2] = res[2];
                 }
             }
             return result;
