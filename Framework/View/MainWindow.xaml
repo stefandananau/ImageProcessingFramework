@@ -199,6 +199,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.AverageFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Spline"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.SplineCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"

@@ -1001,6 +1001,25 @@ namespace Framework.ViewModel
         }
         #endregion
 
+        #region splinetool
+        private ICommand _splineCommand;
+        public ICommand SplineCommand
+        {
+            get
+            {
+                if (_splineCommand == null)
+                    _splineCommand = new RelayCommand(Spline);
+                return _splineCommand;
+            }
+        }
+        private void Spline(object parameter)
+        {
+            HermitGraphWindow hgw = new HermitGraphWindow();
+            hgw.Show();
+        }
+
+        #endregion
+
         #region Save processed image as original image
         private ICommand _saveAsOriginalImageCommand;
         public ICommand SaveAsOriginalImageCommand

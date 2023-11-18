@@ -71,6 +71,7 @@
     <Compile Include="Utilities\PointHelper.cs" />
     <Compile Include="ViewModel\Commands\MenuCommands.cs" />
     <Compile Include="ViewModel\Commands\RelayCommand.cs" />
+    <Compile Include="ViewModel\HermitGraphVM.cs" />
     <Compile Include="ViewModel\HistogramVM.cs" />
     <Compile Include="ViewModel\LevelsVM\ColorLevelsVM.cs" />
     <Compile Include="ViewModel\LevelsVM\ColumnColorLevelsVM.cs" />
@@ -94,6 +95,9 @@
     <Compile Include="View\GraphWindow.xaml.cs">
       <DependentUpon>GraphWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\HermitGraphWindow.xaml.cs">
+      <DependentUpon>HermitGraphWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\HistogramWindow.xaml.cs">
       <DependentUpon>HistogramWindow.xaml</DependentUpon>
     </Compile>
@@ -106,6 +110,10 @@
     <Compile Include="View\SliderWindow.xaml.cs">
       <DependentUpon>SliderWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\HermitGraphWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\HistogramWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
