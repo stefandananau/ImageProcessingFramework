@@ -465,5 +465,213 @@ namespace Algorithms.Tools
             return result;
         }
         #endregion
+
+        #region emboss
+
+        private static byte ComputeEmboss(Image<Gray, byte> image, int y, int x, int borderdim)
+        {
+            byte result;
+            int sum = 0;
+            int maskdim = borderdim * 2 + 1;
+            byte[,] mask = new byte[maskdim, maskdim];
+            x = x - borderdim;
+            y = y - borderdim;
+            for(int i = 0; i < maskdim; i++)
+            {
+                for(int j = 0; j < maskdim; j++)
+                {
+                    mask[i, j] = image.Data[y + i, x + j, 0];
+                }
+            }
+
+            for (int i = 0; i < maskdim; i++)
+            {
+                for (int j = 0; j < maskdim; j++)
+                {
+                    if(i + j < borderdim * 2)
+                    {
+                        sum = sum - mask[i, j];
+                    }
+                    if(i + j > borderdim * 2)
+                    {
+                        sum = sum + mask[i, j];
+                    }
+                }
+            }
+
+            result = (byte)(sum / maskdim* maskdim);
+            result = (byte)(result + 128);
+            return result;
+        }
+        private static byte[] ComputeEmboss(Image<Bgr, byte> image, int y, int x, int borderdim)
+        {
+            byte[] result = new byte[3];
+            int sumb = 0;
+            int sumg = 0;
+            int sumr = 0;
+            int maskdim = borderdim * 2 + 1;
+            byte[,,] mask = new byte[maskdim, maskdim,3];
+            x = x - borderdim;
+            y = y - borderdim;
+            for (int i = 0; i < maskdim; i++)
+            {
+                for (int j = 0; j < maskdim; j++)
+                {
+                    mask[i, j, 0] = image.Data[y + i, x + j, 0];
+                    mask[i, j, 1] = image.Data[y + i, x + j, 1];
+                    mask[i, j, 2] = image.Data[y + i, x + j, 2];
+                }
+            }
+
+            for (int i = 0; i < maskdim; i++)
+            {
+                for (int j = 0; j < maskdim; j++)
+                {
+                    if (i + j < borderdim * 2)
+                    {
+                        sumb = sumb - mask[i, j, 0];
+                        sumg = sumg - mask[i, j, 1];
+                        sumr = sumr - mask[i, j, 2];
+                    }
+                    if (i + j > borderdim * 2)
+                    {
+                        sumb = sumb + mask[i, j, 0];
+                        sumg = sumg + mask[i, j, 1];
+                        sumr = sumr + mask[i, j, 2];
+                    }
+                }
+            }
+
+            result[0] = (byte)(sumb / maskdim * maskdim);
+            result[0] = (byte)(result[0] + 128);
+            result[1] = (byte)(sumg / maskdim * maskdim);
+            result[1] = (byte)(result[1] + 128);
+            result[2] = (byte)(sumr / maskdim * maskdim);
+            result[2] = (byte)(result[2] + 128);
+            return result;
+        }
+        public static Image<Gray, byte> Emboss(Image<Gray, byte> inputImage, bool is3)
+        {
+            int border;
+            if (is3 == true)
+            {
+                border = 1;
+            }
+            else
+            {
+                border = 2;
+            }
+
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+            Image<Gray, byte> helper = new Image<Gray, byte>(height: inputImage.Height + 2 * border, width: inputImage.Width + 2 * border);
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    helper.Data[y + border, x + border, 0] = inputImage.Data[y, x, 0];
+                }
+            }
+            for (int i = 0; i < border; i++)
+            {
+                for (int j = 0; j < inputImage.Height; j++)
+                {
+                    helper.Data[j + border, i, 0] = inputImage.Data[j, 0, 0];
+                    helper.Data[j + border, inputImage.Width + border + i, 0] = inputImage.Data[j, inputImage.Width - 1, 0];
+                }
+                for (int j = 0; j < inputImage.Width; j++)
+                {
+                    helper.Data[i, j + border, 0] = inputImage.Data[0, j, 0];
+                    helper.Data[inputImage.Height + border + i, j + border, 0] = inputImage.Data[inputImage.Height - 1, j, 0];
+                }
+                for (int j = 0; j < border; j++)
+                {
+                    helper.Data[i, j, 0] = inputImage.Data[0, 0, 0];
+                    helper.Data[inputImage.Height + border + i, j, 0] = inputImage.Data[inputImage.Height - 1, 0, 0];
+                    helper.Data[i, inputImage.Width + border + j, 0] = inputImage.Data[0, inputImage.Width - 1, 0];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 0] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 0];
+                }
+            }
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    result.Data[y, x, 0] = ComputeEmboss(helper, y + border, x + border, border);
+                }
+            }
+            return result;
+        }
+        public static Image<Bgr, byte> Emboss(Image<Bgr, byte> inputImage, bool is3)
+        {
+            int border;
+            if (is3 == true)
+            {
+                border = 1;
+            }
+            else
+            {
+                border = 2;
+            }
+
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            Image<Bgr, byte> helper = new Image<Bgr, byte>(height: inputImage.Height + 2 * border, width: inputImage.Width + 2 * border);
+
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    helper.Data[y + border, x + border, 0] = inputImage.Data[y, x, 0];
+                    helper.Data[y + border, x + border, 1] = inputImage.Data[y, x, 1];
+                    helper.Data[y + border, x + border, 2] = inputImage.Data[y, x, 2];
+                }
+            }
+            for (int i = 0; i < border; i++)
+            {
+                for (int j = 0; j < inputImage.Height; j++)
+                {
+                    helper.Data[j + border, i, 0] = inputImage.Data[j, 0, 0];
+                    helper.Data[j + border, i, 1] = inputImage.Data[j, 0, 1];
+                    helper.Data[j + border, i, 2] = inputImage.Data[j, 0, 2];
+                    helper.Data[j + border, inputImage.Width + border + i, 0] = inputImage.Data[j, inputImage.Width - 1, 0];
+                    helper.Data[j + border, inputImage.Width + border + i, 1] = inputImage.Data[j, inputImage.Width - 1, 1];
+                    helper.Data[j + border, inputImage.Width + border + i, 2] = inputImage.Data[j, inputImage.Width - 1, 2];
+                }
+                for (int j = 0; j < inputImage.Width; j++)
+                {
+                    helper.Data[i, j + border, 0] = inputImage.Data[0, j, 0];
+                    helper.Data[i, j + border, 1] = inputImage.Data[0, j, 1];
+                    helper.Data[i, j + border, 2] = inputImage.Data[0, j, 2];
+                    helper.Data[inputImage.Height + border + i, j + border, 0] = inputImage.Data[inputImage.Height - 1, j, 0];
+                    helper.Data[inputImage.Height + border + i, j + border, 1] = inputImage.Data[inputImage.Height - 1, j, 1];
+                    helper.Data[inputImage.Height + border + i, j + border, 2] = inputImage.Data[inputImage.Height - 1, j, 2];
+                }
+                for (int j = 0; j < border; j++)
+                {
+                    helper.Data[i, j, 0] = inputImage.Data[0, 0, 0];
+                    helper.Data[i, j, 1] = inputImage.Data[0, 0, 1];
+                    helper.Data[i, j, 2] = inputImage.Data[0, 0, 2];
+                    helper.Data[inputImage.Height + border + i, j, 0] = inputImage.Data[inputImage.Height - 1, 0, 0];
+                    helper.Data[inputImage.Height + border + i, j, 1] = inputImage.Data[inputImage.Height - 1, 0, 1];
+                    helper.Data[inputImage.Height + border + i, j, 2] = inputImage.Data[inputImage.Height - 1, 0, 2];
+                    helper.Data[i, inputImage.Width + border + j, 0] = inputImage.Data[0, inputImage.Width - 1, 0];
+                    helper.Data[i, inputImage.Width + border + j, 1] = inputImage.Data[0, inputImage.Width - 1, 1];
+                    helper.Data[i, inputImage.Width + border + j, 2] = inputImage.Data[0, inputImage.Width - 1, 2];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 0] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 0];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 1] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 1];
+                    helper.Data[inputImage.Height + border + i, inputImage.Width + border + j, 2] = inputImage.Data[inputImage.Height - 1, inputImage.Width - 1, 2];
+                }
+            }
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    var res = ComputeEmboss(helper, y+ border, x + border, border);
+                    result.Data[y, x, 0] = res[0];
+                    result.Data[y, x, 1] = res[1];
+                    result.Data[y, x, 2] = res[2];
+                }
+            }
+            return result;
+        }
+        #endregion
     }
 }

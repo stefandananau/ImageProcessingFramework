@@ -1001,21 +1001,45 @@ namespace Framework.ViewModel
         }
         #endregion
 
-        #region splinetool
-        private ICommand _splineCommand;
-        public ICommand SplineCommand
+        #region Emboss
+        private ICommand _embossCommand;
+        public ICommand EmbossCommand
         {
             get
             {
-                if (_splineCommand == null)
-                    _splineCommand = new RelayCommand(Spline);
-                return _splineCommand;
+                if (_embossCommand == null)
+                    _embossCommand = new RelayCommand(Emboss);
+                return _embossCommand;
             }
         }
-        private void Spline(object parameter)
+        private void Emboss(object parameter)
         {
-            HermitGraphWindow hgw = new HermitGraphWindow();
-            hgw.Show();
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+
+            SliderWindow swindow = new SliderWindow(_mainVM, "Filter dimension: ");
+            swindow.ConfigureSlider(
+                minimumValue: 3,
+                maximumValue: 5,
+                value: 3,
+                frequency: 2);
+            swindow.ShowDialog();
+
+            var is3 = (int)swindow.slider.Value == 3;
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Emboss(GrayInitialImage, is3);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Emboss(ColorInitialImage, is3);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
         }
 
         #endregion

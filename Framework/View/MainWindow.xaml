@@ -199,9 +199,9 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.AverageFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                <MenuItem Header="Spline"
+                <MenuItem Header="Emboss"
                           Foreground="#1E1E1E"
-                          Command="{Binding Path=MenuCommands.SplineCommand}"
+                          Command="{Binding Path=MenuCommands.EmbossCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
