@@ -1044,6 +1044,42 @@ namespace Framework.ViewModel
 
         #endregion
 
+        #region conex omponents
+        private ICommand _conexCommand;
+        public ICommand ConexCommand
+        {
+            get
+            {
+                if (_conexCommand == null)
+                    _conexCommand = new RelayCommand(ConexComponents);
+                return _conexCommand;
+            }
+        }
+
+        private void ConexComponents(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+
+            if (ColorInitialImage != null)
+            {
+                var GrayTransitionImage = Tools.Convert(ColorInitialImage);
+                var BinaryImage = Tools.Thresholding(GrayTransitionImage, 127);
+
+                ColorProcessedImage = Tools.Conex(BinaryImage);
+            }
+            else if (GrayInitialImage != null)
+            {
+                var BinaryImage = Tools.Thresholding(GrayInitialImage, 127);
+                ColorProcessedImage = Tools.Conex(BinaryImage);
+            }
+            ProcessedImage = Convert(ColorProcessedImage);
+        }
+        #endregion
+
         #region Save processed image as original image
         private ICommand _saveAsOriginalImageCommand;
         public ICommand SaveAsOriginalImageCommand

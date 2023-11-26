@@ -203,6 +203,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.EmbossCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Conex"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ConexCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"

@@ -1,6 +1,8 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using static System.Math;
 
 namespace Algorithms.Utilities
@@ -155,6 +157,42 @@ namespace Algorithms.Utilities
                 sum = sum + vector[i];
             }
             return sum/vector.Length;
+        }
+        #endregion
+
+        #region components
+        public static bool isPartOfAComponent(Point point, List<Component> components)
+        {
+            foreach(var component in components)
+            {
+                if (component.Contains(point))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static List<Point> GetNeighbors(Point point, int xMax, int yMax)
+        {
+            var neighbors = new List<Point>();
+            if(point.X > 0)
+            {
+                neighbors.Add(new Point(point.X - 1, point.Y));
+            }
+            if(point.Y > 0)
+            {
+                neighbors.Add(new Point(point.X, point.Y - 1));
+            }
+            if(point.X < xMax)
+            {
+                neighbors.Add(new Point(point.X + 1, point.Y));
+            }
+            if(point.Y < yMax)
+            {
+                neighbors.Add(new Point(point.X, point.Y + 1));
+            }
+            return neighbors;
         }
         #endregion
     }

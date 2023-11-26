@@ -2,8 +2,8 @@
 using Emgu.CV.Structure;
 using System.Drawing;
 using System;
-using OpenTK.Graphics.OpenGL;
-using ZedGraph;
+using System.Collections.Generic;
+using Algorithms.Utilities;
 
 namespace Algorithms.Tools
 {
@@ -670,6 +670,104 @@ namespace Algorithms.Tools
                     result.Data[y, x, 2] = res[2];
                 }
             }
+            return result;
+        }
+        #endregion
+
+        #region conex
+        public static Image<Bgr, byte> Conex(Image<Gray, byte> inputImage)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            var components = new List<Component>();
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    result.Data[y, x, 0] = 255;
+                    result.Data[y, x, 1] = 255;
+                    result.Data[y, x, 2] = 255;
+                    if (inputImage.Data[y, x, 0] == 0)
+                    {
+                        var start_point = new Point(x, y);
+                        if(!Utils.isPartOfAComponent(start_point, components))
+                        {
+                            Random rnd = new Random();
+                            var component = new Component((byte)rnd.Next(), (byte)rnd.Next(), (byte)rnd.Next());
+                            var queue = new Queue<Point>();
+                            queue.Enqueue(start_point);
+                            while(queue.Count != 0)
+                            {
+                                var current = queue.Dequeue();
+                                var neighbors = Utils.GetNeighbors(current, inputImage.Width - 1, inputImage.Height - 1);
+                                foreach(var neighbor in neighbors)
+                                {
+                                    if (inputImage.Data[neighbor.Y, neighbor.X, 0] == 0 && !component.Contains(neighbor))
+                                    {
+                                        component.AddPoint(neighbor);
+                                        queue.Enqueue(neighbor);
+                                    }
+                                }
+                            }
+                            components.Add(component);
+                        }
+                    }
+                }
+            }
+            
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    var found_point = new Point(x, y);
+                    if (inputImage.Data[y, x, 0] == 0)
+                    {
+                        foreach(var component in components)
+                        {
+                            if (component.Contains(found_point))
+                            {
+                                result.Data[y, x, 0] = component.Color[0];
+                                result.Data[y, x, 1] = component.Color[1];
+                                result.Data[y, x, 2] = component.Color[2];
+                            }
+                        }
+                    }
+                }
+            }
+
+            var largestComponent = new Component(0, 0, 0);
+            var max = 0;
+
+            foreach (var component in components)
+            {
+               if(component.Size() > max)
+                {
+                    max = component.Size();
+                    largestComponent = component;
+                }
+            }
+
+            var lu = largestComponent.LeftUp();
+            var rd = largestComponent.RightDown();
+            for(int i = lu.X; i <= rd.X; i++)
+            {
+                result.Data[lu.Y, i, 0] = 0;
+                result.Data[lu.Y, i, 1] = 0;
+                result.Data[lu.Y, i, 2] = 0;
+                result.Data[rd.Y, i, 0] = 0;
+                result.Data[rd.Y, i, 1] = 0;
+                result.Data[rd.Y, i, 2] = 0;
+            }
+
+            for(int i = lu.Y; i <= rd.Y; i++)
+            {
+                result.Data[i, lu.X, 0] = 0;
+                result.Data[i, lu.X, 1] = 0;
+                result.Data[i, lu.X, 2] = 0;
+                result.Data[i, rd.X, 0] = 0;
+                result.Data[i, rd.X, 1] = 0;
+                result.Data[i, rd.X, 2] = 0;
+            }
+
             return result;
         }
         #endregion
