@@ -4,6 +4,8 @@ using System.Drawing;
 using System;
 using System.Collections.Generic;
 using Algorithms.Utilities;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Algorithms.Tools
 {
@@ -768,6 +770,130 @@ namespace Algorithms.Tools
                 result.Data[i, rd.X, 2] = 0;
             }
 
+            return result;
+        }
+        #endregion
+
+        #region scalare
+        
+
+        private static double InterpolareCubica(double x, double a, double b , double c, double d)
+        {
+            return 0.5 * (
+                (-Math.Pow(x, 3) + 2 * Math.Pow(x, 2) - x) * a
+                + (3 * Math.Pow(x, 3) - 5 * Math.Pow(x, 2) + 2) * b
+                + (-3 * Math.Pow(x, 3) + 4 * Math.Pow(x, 2) + x) * c
+                + (Math.Pow(x, 3) - Math.Pow(x, 2)) * d
+                );
+        }
+
+        private static double InterpolareBicubica(double x, double y, int[,] f)
+        {
+            var p0 = InterpolareCubica(x, f[0, 0], f[0, 1], f[0, 2], f[0, 3]);
+            var p1 = InterpolareCubica(x, f[1, 0], f[1, 1], f[1, 2], f[1, 3]);
+            var p2 = InterpolareCubica(x, f[2, 0], f[2, 1], f[2, 2], f[2, 3]);
+            var p3 = InterpolareCubica(x, f[3, 0], f[3, 1], f[3, 2], f[3, 3]);
+            return InterpolareCubica(y, p0, p1, p2, p3);
+        }
+        private static Image<Gray, byte> Scalare(Image<Gray, byte> inputImage, double multiplier)
+        {
+            var newHeight = (int)(inputImage.Height * multiplier);
+            var newWidth = (int)(inputImage.Width * multiplier);
+            Image<Gray, byte> result = new Image<Gray, byte>(newWidth, newHeight);
+            for (int y = 0; y <= newHeight - 1; y++)
+            {
+                for (int x = 0; x <= newWidth - 1; x++)
+                {
+                    var xc = (int)(x / multiplier);
+                    var yc = (int)(y / multiplier);
+                    result.Data[y, x, 0] = inputImage.Data[yc, xc, 0];
+                }
+            }
+            return result;
+        }
+
+        private static Image<Bgr, byte> Scalare(Image<Bgr, byte> inputImage, double multiplier)
+        {
+            var newHeight = (int)(inputImage.Height * multiplier);
+            var newWidth = (int)(inputImage.Width * multiplier);
+            Image<Bgr, byte> result = new Image<Bgr, byte>(newWidth, newHeight);
+            for (int y = 0; y <= newHeight - 1; y++)
+            {
+                for (int x = 0; x <= newWidth - 1; x++)
+                {
+                    var xc = (int)(x / multiplier);
+                    var yc = (int)(y / multiplier);
+                    result.Data[y, x, 0] = inputImage.Data[yc, xc, 0];
+                    result.Data[y, x, 1] = inputImage.Data[yc, xc, 1];
+                    result.Data[y, x, 2] = inputImage.Data[yc, xc, 2];
+                }
+            }
+            return result;
+        }
+
+        public static Image<Gray, byte> ScalareBicubica(Image<Gray, byte> inputImage, double multiplier)
+        {
+            Image<Gray, byte> result = Scalare(inputImage, multiplier);
+            var f = new int[4, 4];
+            for (int y = 0; y <= result.Height - 1; y++)
+            {
+                for (int x = 0; x <= result.Width - 1; x++)
+                {
+                    var xc = (x / multiplier);
+                    var yc = (y / multiplier);
+                    var x0 = (int)xc;
+                    var y0 = (int)yc;
+                    if (x0 > 0 && y0 > 0 && x0 < inputImage.Width - 2 && y0 < inputImage.Height - 2)
+                    {
+                        for (int i = -1; i <= 2; i++)
+                        {
+                            for (int j = -1; j <= 2; j++)
+                            {
+                                f[i + 1, j + 1] = inputImage.Data[y0 + i, x0 + j, 0];
+                            }
+                        }
+                        var re = InterpolareBicubica(xc - Math.Truncate(xc), yc - Math.Truncate(yc), f);
+                        result.Data[y, x, 0] = (byte)(re + 0.5);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static Image<Bgr, byte> ScalareBicubica(Image<Bgr, byte> inputImage, double multiplier)
+        {
+            Image<Bgr, byte> result = Scalare(inputImage, multiplier);
+            var f0 = new int[4, 4];
+            var f1 = new int[4, 4];
+            var f2 = new int[4, 4];
+            for (int y = 0; y <= result.Height - 1; y++)
+            {
+                for (int x = 0; x <= result.Width - 1; x++)
+                {
+                    var xc = (x / multiplier);
+                    var yc = (y / multiplier);
+                    var x0 = (int)xc;
+                    var y0 = (int)yc;
+                    if (x0 > 0 && y0 > 0 && x0 < inputImage.Width - 2 && y0 < inputImage.Height - 2)
+                    {
+                        for (int i = -1; i <= 2; i++)
+                        {
+                            for (int j = -1; j <= 2; j++)
+                            {
+                                f0[i + 1, j + 1] = inputImage.Data[y0 + i, x0 + j, 0];
+                                f1[i + 1, j + 1] = inputImage.Data[y0 + i, x0 + j, 1];
+                                f2[i + 1, j + 1] = inputImage.Data[y0 + i, x0 + j, 2];
+                            }
+                        }
+                        var re0 = InterpolareBicubica(xc - Math.Truncate(xc), yc - Math.Truncate(yc), f0);
+                        var re1 = InterpolareBicubica(xc - Math.Truncate(xc), yc - Math.Truncate(yc), f1);
+                        var re2 = InterpolareBicubica(xc - Math.Truncate(xc), yc - Math.Truncate(yc), f2);
+                        result.Data[y, x, 0] = (byte)(re0 + 0.5);
+                        result.Data[y, x, 1] = (byte)(re1 + 0.5);
+                        result.Data[y, x, 2] = (byte)(re2 + 0.5);
+                    }
+                }
+            }
             return result;
         }
         #endregion

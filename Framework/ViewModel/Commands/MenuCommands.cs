@@ -1092,6 +1092,43 @@ namespace Framework.ViewModel
             }
         }
 
+        #region bicubic scaling
+        private ICommand _bicubicScalingCommand;
+        public ICommand BicubicScalingCommand
+        {
+            get
+            {
+                if (_bicubicScalingCommand == null)
+                    _bicubicScalingCommand = new RelayCommand(BicubicScaling);
+                return _bicubicScalingCommand;
+            }
+        }
+
+        private void BicubicScaling(object parameter)
+        {
+            SliderWindow swindow = new SliderWindow(_mainVM, "Scale: ");
+            swindow.ConfigureSlider(
+                minimumValue: 0.1,
+                maximumValue: 10,
+                value: 0.1,
+                frequency: 0.01);
+            swindow.ShowDialog();
+
+            var scale = swindow.slider.Value;
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.ScalareBicubica(GrayInitialImage, scale);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.ScalareBicubica(ColorInitialImage, scale);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+        #endregion
+
         private void SaveAsOriginalImage(object parameter)
         {
             if (ProcessedImage == null)

@@ -207,6 +207,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.ConexCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Bicubic scaling"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.BicubicScalingCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"
